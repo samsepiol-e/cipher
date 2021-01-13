@@ -1,5 +1,5 @@
 from PIL import Image
-import io
+import os
 def genData(data):
     newd = []
     for i in data:
@@ -65,24 +65,36 @@ def extract_data(imgfile):
             return data
 
 def main():
-    f = open('testfile', 'r')
-    data = f.read()
-    ifilename = 'test.jpg'
-    imgfile = Image.open('test.jpg', 'r')
-    oimage = imgfile.copy()
+    wdir = input('Please enter your working directory : ')
+    wdir = os.path.expanduser(wdir)
+    imgname = input('Please enter your image file name : ')
+    filename = input('Please enter your data file name : ')
+    imgfile = Image.open(os.path.join(wdir, imgname), 'r')
+    filepath = os.path.join(wdir, filename)
     print('-'*60)
-    print(f'embedding data into image file {ifilename}')
-    print(f'Data : {data}')
-    embed_data(oimage, data)
+    print('''
+    1. Embed Data
+    2. Extract Data
+    ''')
+    choice = input('Please choose from above option : ')
     print('-'*60)
-    print('Extracting Data From Image')
-    print('file name test_em.png')
-    extracted = extract_data(oimage)
-    oimage.save('test_em.png', 'PNG')
-    emb_image = Image.open('test_em.png', 'r')
-    extracted = extract_data(emb_image)
-    print(f'Extracted {extracted}')
-    print('-'*60)
+    if choice == '1':
+        f = open(filepath, 'r')
+        data = f.read()
+        f.close()
+        oimage = imgfile.copy()
+        embed_data(oimage, data)
+        print(f'embedding data into image file {imgname}')
+        print(f'Data : {data}')
+        outname = imgname.split('.')[0]+'_1'+'.png'
+        oimage.save(os.path.join(wdir, outname), 'PNG')
+        print(f'data embedded into file {outname}')
+    elif choice == '2':
+        print(f'Extracting Data From {imgname}')
+        extracted = extract_data(imgfile)
+        print(f'Extracted {extracted}')
+        f = open(filepath, 'w+')
+        f.write(extracted)
 
 if __name__ == '__main__' :
     main()
