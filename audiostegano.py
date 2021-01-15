@@ -2,6 +2,7 @@ from stegano import dataToBin
 import os
 import wave
 import sys
+import itertools
 
 def format_bytes(size):
     power = 2**10
@@ -94,20 +95,22 @@ def extractDataFromFrame(frame_bytes):
     sys.stdout.flush()
     sys.stdout.write('\b'*10)
     while True:
-        last_bits = [frames.__next__() & 1 for i in range(9)]
+        last_bits = itertools.islice(frames, 0, 9)
         binstr = ''
         extracted_bytes+=1
         size, label = format_bytes(extracted_bytes)
         showbytes = f'{size:7.2f} {label}'
         sys.stdout.write("%s" % (showbytes))
         sys.stdout.flush()
-        sys.stdout.write('\b'*len(showbytes))
-        for i in range(0, 8):
-            binval = str(last_bits[i])
+        for i, b in zip(range(0, 8), last_bits):
+            binval = str(b&1)
             binstr+=binval
 
         data += bytes([int(binstr, 2)])
-        if last_bits[-1] == 1:
+        last_bit = last_bits.__next__()
+        if last_bit == 1:
+            sys.stdout.write('\n')
             return data
+        sys.stdout.write('\b'*len(showbytes))
 
 
