@@ -1,13 +1,16 @@
 from PIL import Image
 import os
-def genData(data):
-    newd = []
-    for i in data:
-        newd.append(format(ord(i), '08b'))
-    return newd
+def dataToBin(data):
+    binlist = []
+    if isinstance(data, bytes):
+        binlist = [format(i, '08b') for i in data]
+    else:
+        binlist = [format(ord(i), '08b') for i in data]
+
+    return binlist
 
 def modPix(pix, data):
-    datalist = genData(data)
+    datalist = dataToBin(data)
     lendata = len(datalist)
     imdata = iter(pix)
     for i in range(lendata):
@@ -79,7 +82,7 @@ def main():
     choice = input('Please choose from above option : ')
     print('-'*60)
     if choice == '1':
-        f = open(filepath, 'r')
+        f = open(filepath, 'rb')
         data = f.read()
         f.close()
         oimage = imgfile.copy()
@@ -93,7 +96,7 @@ def main():
         print(f'Extracting Data From {imgname}')
         extracted = extract_data(imgfile)
         print(f'Extracted {extracted}')
-        f = open(filepath, 'w+')
+        f = open(filepath, 'wb+')
         f.write(extracted)
 
 if __name__ == '__main__' :
