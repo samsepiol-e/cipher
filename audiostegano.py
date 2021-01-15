@@ -22,6 +22,9 @@ def framebytes_from_wave(filename):
     return musicparams, frame_bytes
 
 def embed_data_to_frame(frame_bytes, data):
+    datalen = len(data)
+    size, label = format_bytes(datalen)
+    print(f'Embedding Data of size {size} {label}')
     modified_frames = modFrame(frame_bytes, data)
     return modified_frames + frame_bytes[len(modified_frames):]
 
@@ -68,7 +71,7 @@ def modFrame(frame_bytes, data):
                     frame = frame & 254 | 1
 
                 else:
-                    frame = frame & 254 | 0
+                    frame = frame & 254
                 modframes.append(frame)
     return bytearray(modframes)
 
