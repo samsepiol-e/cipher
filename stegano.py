@@ -16,14 +16,17 @@ def modPix(pix, data):
     for i in range(lendata):
         pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
         for j in range(0, 8):
-            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
-                pix[j] -= 1
-
-            elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
-                if(pix[j] != 0):
-                    pix[j] -= 1
-                else:
-                    pix[j] += 1
+            bump = int(datalist[i][j])^pix[j]
+            pix[j] -= bump
+            pix[j] = abs(pix[j])
+#            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
+#                pix[j] -= 1
+#
+#            elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
+#                if(pix[j] != 0):
+#                    pix[j] -= 1
+#                else:
+#                    pix[j] += 1
         if (i == lendata - 1):
             if (pix[-1] % 2 == 0):
                 if(pix[-1] != 0):
