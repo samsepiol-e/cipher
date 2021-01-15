@@ -17,6 +17,11 @@ def main():
         if choice == '3':
             break
         key = input('Please enter your encryption key : ')
+        print('-'*60)
+        for f in os.listdir(fdir):
+            print(f)
+        print('-'*60)
+        os.listdir(fdir)
         filename = input('Please enter your filename : ')
         ifilename = input('Please enter your image filename : ')
         fabspath = os.path.join(fdir, filename)
