@@ -27,7 +27,7 @@ def main():
         fabspath = os.path.join(fdir, filename)
         ifabspath = os.path.join(fdir, ifilename)
         imgfile = Image.open(ifabspath, 'r')
-        ofilename = ifilename.split('.')[0]+'.png'
+        ofilename = ifilename.split('.')[0]+'_1.png'
 
         print('-'*60)
         if choice == '1':
