@@ -52,7 +52,7 @@ def embed_data(output_img, data):
             x += 1
 
 def extract_data(imgfile):
-    data = ''
+    data = b''
     imgdata = iter(imgfile.getdata())
     while (True):
         pixels = [value for value in imgdata.__next__()[:3] + imgdata.__next__()[:3] + imgdata.__next__()[:3]]
@@ -63,7 +63,7 @@ def extract_data(imgfile):
             else:
                 binstr += '1'
 
-        data += chr(int(binstr, 2))
+        data += bytes([int(binstr, 2)])
         if (pixels[-1] % 2 != 0):
             return data
 
