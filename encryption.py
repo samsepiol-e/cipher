@@ -20,12 +20,12 @@ def encrypt(key, source, b64encode=True):
     padding = AES.block_size - len(source) % AES.block_size  
     source += bytes([padding]) * padding  
     data = IV + encryptor.encrypt(source)  
-    return base64.b64encode(data).decode("latin-1") if b64encode else data
+    return base64.b64encode(data) if b64encode else data
 
 
 def decrypt(key, source, b64decode=True):
     if b64decode:
-        source = base64.b64decode(source.encode("latin-1"))
+        source = base64.b64decode(source)
     key = encode(key)
     key = SHA256.new(key).digest()  
     IV = source[:AES.block_size]  
@@ -37,25 +37,29 @@ def decrypt(key, source, b64decode=True):
     return data[:-padding]  
 
 def encryptfile(key, filein, fileout):
-    f = open(filein, 'r')
+    f = open(filein, 'rb')
     source = f.read()
     f.close()
     data = encrypt(key, source)
-    print(f'Data Encrypted : \n {data}')
-    f = open(fileout, 'w+')
+    f = open(fileout, 'wb+')
     f.write(data)
     f.close()
     
 def decryptfile(key, filein, fileout):
-    f = open(filein, 'r')
+    f = open(filein, 'rb')
     source = f.read()
     f.close()
     data = decrypt(key, source)
-    data = decode(data)
-    print(f'Data Decrypted : \n {data}')
-    f = open(fileout, 'w+')
+    #data = decode(data)
+    #print(f'Data Decrypted : \n {data}')
+    f = open(fileout, 'wb+')
     f.write(data)
     f.close()
 
-
+def main():
+    key = input('Enter your key : ')
+    encryptfile(key, 'test.tar.gz', 'enc_test.tar.gz')
+    decryptfile(key, 'enc_test.tar.gz', 'dec_tet.tar.gz')
+if __name__ == '__main__':
+    main()
 
