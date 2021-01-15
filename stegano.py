@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+import sys
 def dataToBin(data):
     binlist = []
     if isinstance(data, bytes):
@@ -16,7 +17,7 @@ def modPix(pix, data):
     for i in range(lendata):
         pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
         for j in range(0, 8):
-            bump = int(datalist[i][j])^pix[j]
+            bump = int(datalist[i][j])^(pix[j]%2)
             pix[j] -= bump
             pix[j] = abs(pix[j])
 #            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
@@ -59,6 +60,14 @@ def embed_data(imgfile, data):
 def embed_data_from_file(ifilepath, filepath, ofilename):
     imgfile = Image.open(ifilepath, 'r')
     wdir = os.path.dirname(ifilepath)
+    filesize = os.path.getsize(filepath)
+    width, height = imgfile.size
+    pixels = width*height
+    print(f'File Size : {filesize}')
+    print(f'Pixels : {pixels}')
+    if filesize > pixels /3:
+        print('File is too large')
+        sys.exit()
     f = open(filepath, 'rb')
     data = f.read()
     #print(f'Data : {data}')
