@@ -40,7 +40,8 @@ def modPix(pix, data):
         yield pix[3:6]
         yield pix[6:9]
 
-def embed_data(output_img, data):
+def embed_data(imgfile, data):
+    output_img = imgfile.copy()
     w = output_img.size[0]
     (x, y) = (0, 0)
     for pixel in modPix(output_img.getdata(), data):
@@ -50,6 +51,20 @@ def embed_data(output_img, data):
             y += 1
         else:
             x += 1
+    return output_img
+
+def embed_data_from_file(ifilepath, filepath, ofilename):
+    imgfile = Image.open(ifilepath, 'r')
+    wdir = os.path.dirname(ifilepath)
+    f = open(filepath, 'rb')
+    data = f.read()
+    #print(f'Data : {data}')
+    f.close()
+    oimage = embed_data(imgfile, data)
+    oimage.save(os.path.join(wdir, ofilename), 'PNG')
+    print(f'Data Embedded to {ofilename}')
+
+
 
 def extract_data(imgfile):
     data = b''
@@ -66,6 +81,16 @@ def extract_data(imgfile):
         data += bytes([int(binstr, 2)])
         if (pixels[-1] % 2 != 0):
             return data
+
+def extract_data_from_file(ifilepath, ofilename):
+    imgfile = Image.open(ifilepath, 'r')
+    wdir = os.path.dirname(ifilepath)
+    data = extract_data(imgfile)
+    #print(f'Data : {data}')
+    f = open(os.path.join(wdir, ofilename), 'wb+')
+    f.write(data)
+    print(f'Data Extracted to {ofilename}')
+
 
 def main():
     wdir = input('Please enter your working directory : ')
