@@ -56,5 +56,10 @@ def decryptfile(key, filein, fileout):
     f.write(data)
     f.close()
 
-
+def main():
+    key = input('Enter your key : ')
+    encryptfile(key, 'test.tar.gz', 'enc_test.tar.gz')
+    decryptfile(key, 'enc_test.tar.gz', 'dec_tet.tar.gz')
+if __name__ == '__main__':
+    main()
 
