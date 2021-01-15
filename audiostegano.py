@@ -1,6 +1,7 @@
 from stegano import dataToBin
 import os
 import wave
+import sys
 
 def format_bytes(size):
     power = 2**10
@@ -22,6 +23,9 @@ def framebytes_from_wave(filename):
     return musicparams, frame_bytes
 
 def embed_data_to_frame(frame_bytes, data):
+    datalen = len(data)
+    size, label = format_bytes(datalen)
+    print(f'Embedding Data of size {size} {label}')
     modified_frames = modFrame(frame_bytes, data)
     return modified_frames + frame_bytes[len(modified_frames):]
 
@@ -56,8 +60,18 @@ def modFrame(frame_bytes, data):
     lendata = len(datalist)
     frames = iter(frame_bytes)
     lenframebytes = len(frame_bytes)
+    embedded_bytes = 0
+    sys.stdout.write('Embedded:           ')
+    sys.stdout.flush()
+    sys.stdout.write('\b'*10)
     modframes = []
     for i in range(lendata):
+        embedded_bytes += 1
+        size, label = format_bytes(embedded_bytes)
+        showbytes = f'{size:7.2f} {label}'
+        sys.stdout.write("%s" % (showbytes))
+        sys.stdout.flush()
+        sys.stdout.write('\b'*len(showbytes))
         for j in range(0, 9):
             if j != 8:
                 frame = (frames.__next__() & 254) | int(datalist[i][j])
@@ -68,16 +82,26 @@ def modFrame(frame_bytes, data):
                     frame = frame & 254 | 1
 
                 else:
-                    frame = frame & 254 | 0
+                    frame = frame & 254
                 modframes.append(frame)
     return bytearray(modframes)
 
 def extractDataFromFrame(frame_bytes):
     frames = iter(frame_bytes)
     data = b''
+    extracted_bytes = 0
+    sys.stdout.write('Extracted:           ')
+    sys.stdout.flush()
+    sys.stdout.write('\b'*10)
     while True:
         last_bits = [frames.__next__() & 1 for i in range(9)]
         binstr = ''
+        extracted_bytes+=1
+        size, label = format_bytes(extracted_bytes)
+        showbytes = f'{size:7.2f} {label}'
+        sys.stdout.write("%s" % (showbytes))
+        sys.stdout.flush()
+        sys.stdout.write('\b'*len(showbytes))
         for i in range(0, 8):
             binval = str(last_bits[i])
             binstr+=binval
