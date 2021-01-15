@@ -1,26 +1,32 @@
 from PIL import Image
 import os
-def genData(data):
-    newd = []
-    for i in data:
-        newd.append(format(ord(i), '08b'))
-    return newd
+def dataToBin(data):
+    binlist = []
+    if isinstance(data, bytes):
+        binlist = [format(i, '08b') for i in data]
+    else:
+        binlist = [format(ord(i), '08b') for i in data]
+
+    return binlist
 
 def modPix(pix, data):
-    datalist = genData(data)
+    datalist = dataToBin(data)
     lendata = len(datalist)
     imdata = iter(pix)
     for i in range(lendata):
         pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
         for j in range(0, 8):
-            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
-                pix[j] -= 1
-
-            elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
-                if(pix[j] != 0):
-                    pix[j] -= 1
-                else:
-                    pix[j] += 1
+            bump = int(datalist[i][j])^pix[j]
+            pix[j] -= bump
+            pix[j] = abs(pix[j])
+#            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
+#                pix[j] -= 1
+#
+#            elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
+#                if(pix[j] != 0):
+#                    pix[j] -= 1
+#                else:
+#                    pix[j] += 1
         if (i == lendata - 1):
             if (pix[-1] % 2 == 0):
                 if(pix[-1] != 0):
@@ -37,7 +43,8 @@ def modPix(pix, data):
         yield pix[3:6]
         yield pix[6:9]
 
-def embed_data(output_img, data):
+def embed_data(imgfile, data):
+    output_img = imgfile.copy()
     w = output_img.size[0]
     (x, y) = (0, 0)
     for pixel in modPix(output_img.getdata(), data):
@@ -47,9 +54,23 @@ def embed_data(output_img, data):
             y += 1
         else:
             x += 1
+    return output_img
+
+def embed_data_from_file(ifilepath, filepath, ofilename):
+    imgfile = Image.open(ifilepath, 'r')
+    wdir = os.path.dirname(ifilepath)
+    f = open(filepath, 'rb')
+    data = f.read()
+    #print(f'Data : {data}')
+    f.close()
+    oimage = embed_data(imgfile, data)
+    oimage.save(os.path.join(wdir, ofilename), 'PNG')
+    print(f'Data Embedded to {ofilename}')
+
+
 
 def extract_data(imgfile):
-    data = ''
+    data = b''
     imgdata = iter(imgfile.getdata())
     while (True):
         pixels = [value for value in imgdata.__next__()[:3] + imgdata.__next__()[:3] + imgdata.__next__()[:3]]
@@ -60,9 +81,19 @@ def extract_data(imgfile):
             else:
                 binstr += '1'
 
-        data += chr(int(binstr, 2))
+        data += bytes([int(binstr, 2)])
         if (pixels[-1] % 2 != 0):
             return data
+
+def extract_data_from_file(ifilepath, ofilename):
+    imgfile = Image.open(ifilepath, 'r')
+    wdir = os.path.dirname(ifilepath)
+    data = extract_data(imgfile)
+    #print(f'Data : {data}')
+    f = open(os.path.join(wdir, ofilename), 'wb+')
+    f.write(data)
+    print(f'Data Extracted to {ofilename}')
+
 
 def main():
     wdir = input('Please enter your working directory : ')
@@ -79,7 +110,7 @@ def main():
     choice = input('Please choose from above option : ')
     print('-'*60)
     if choice == '1':
-        f = open(filepath, 'r')
+        f = open(filepath, 'rb')
         data = f.read()
         f.close()
         oimage = imgfile.copy()
@@ -93,7 +124,7 @@ def main():
         print(f'Extracting Data From {imgname}')
         extracted = extract_data(imgfile)
         print(f'Extracted {extracted}')
-        f = open(filepath, 'w+')
+        f = open(filepath, 'wb+')
         f.write(extracted)
 
 if __name__ == '__main__' :
