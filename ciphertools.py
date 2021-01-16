@@ -7,7 +7,7 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 import uuid
 
-def choosefile(root, prompt):
+def choosefile(prompt):
     print(prompt)
     root = Tk()
     root.withdraw()
