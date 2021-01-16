@@ -50,6 +50,12 @@ def embed_file_to_wave(wavefilepath, filepath, ofilename):
     if modified_frames is not None:
         framebytes_to_file(os.path.join(wdir, ofilename), params, modified_frames)
 
+def extract_data_from_wave(wavefilepath):
+    wdir = os.path.dirname(wavefilepath)
+    params, framebytes = framebytes_from_wave(wavefilepath)
+    data = extractDataFromFrame(framebytes)
+    return data
+
 def extract_file_from_wave(wavefilepath, ofilename):
     wdir = os.path.dirname(wavefilepath)
     params, framebytes = framebytes_from_wave(wavefilepath)
