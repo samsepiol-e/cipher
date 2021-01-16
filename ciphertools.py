@@ -17,7 +17,6 @@ def choosefile(prompt):
 
 
 def main():
-    #Tk().withdraw()
     while True:
         print('-'*60)
         print('''
@@ -32,11 +31,19 @@ def main():
         print('-'*60)
 #        print('Please choose Image/Audio File')
 #        ifabspath = askopenfilename()
-        ifabspath = choosefile('Please choose Image/Audio File')
+        
+        Tk().withdraw()
+        ifabspath = askopenfilename(
+                filetypes = [
+                    ('Accepted Formats', '.wav .jpg, .jpeg .gif .png'),
+                    ],
+                title = 'Please choose Image/Audio File',
+                )
         ifilename = os.path.basename(ifabspath)
         ifiledir = os.path.dirname(ifabspath)
         ifileinfo = ifilename.split('.')
         randsuffix = str(uuid.uuid4())
+        #Tk().destroy()
         if ifileinfo[1].lower() in ['jpg', 'jpeg', 'gif', 'png']:
             fileext = '.png'
             fformat = 'i'
@@ -55,7 +62,9 @@ def main():
         if choice == '1':
             #print('Please choose Data File')
             #fabspath = askopenfilename()
-            fabspath=choosefile('Please choose Data File')
+            Tk().withdraw()
+            fabspath=askopenfilename(title='Please choose Data File')
+            Tk().destroy()
             encryptfile(key, fabspath, fabspath)
             if fformat == 'i':
                 embed_data_from_file(ifabspath, fabspath, ofilename)
