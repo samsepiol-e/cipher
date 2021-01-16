@@ -34,7 +34,7 @@ def main():
         Tk().withdraw()
         ifabspath = askopenfilename(
                 filetypes = [
-                    ('Accepted Formats', '.wav .jpg, .jpeg .gif .png'),
+                    ('Accepted Formats', '.wav .jpg .jpeg .gif .png'),
                     ],
                 title = 'Please choose Image/Audio File',
                 )
