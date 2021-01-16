@@ -35,10 +35,9 @@ def framebytes_to_file(filename, musicparams, frame_bytes):
         fd.setparams(musicparams)
         fd.writeframes(frame_bytes)
 
-def embed_file_to_wave(wavefilepath, filepath):
+def embed_file_to_wave(wavefilepath, filepath, ofilename):
     wdir = os.path.dirname(wavefilepath)
     basename = os.path.basename(wavefilepath)
-    ofilename = basename.split('.')[0]+'_embedded.wav'
     params, framebytes = framebytes_from_wave(wavefilepath)
     f = open(filepath, 'rb')
     data = f.read()
