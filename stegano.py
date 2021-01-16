@@ -94,6 +94,11 @@ def extract_data(imgfile):
         if (pixels[-1] % 2 != 0):
             return data
 
+def extract_data_from_image(ifilepath):
+    imgfile = Image.open(ifilepath, 'r')
+    wdir = os.path.dirname(ifilepath)
+    data = extract_data(imgfile)
+    return data
 def extract_data_from_file(ifilepath, ofilename):
     imgfile = Image.open(ifilepath, 'r')
     wdir = os.path.dirname(ifilepath)
