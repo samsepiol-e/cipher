@@ -2,6 +2,7 @@ from stegano import dataToBin
 import os
 import wave
 import sys
+import itertools
 
 def format_bytes(size):
     power = 2**10
@@ -26,24 +27,28 @@ def embed_data_to_frame(frame_bytes, data):
     datalen = len(data)
     size, label = format_bytes(datalen)
     print(f'Embedding Data of size {size} {label}')
-    modified_frames = modFrame(frame_bytes, data)
-    return modified_frames + frame_bytes[len(modified_frames):]
+    if datalen < len(frame_bytes)//9:
+        modified_frames = modFrame(frame_bytes, data)
+        return modified_frames + frame_bytes[len(modified_frames):]
+    else:
+        print('Data too large to embed. Aborting')
+        return None
 
 def framebytes_to_file(filename, musicparams, frame_bytes):
     with wave.open(filename, 'wb') as fd:
         fd.setparams(musicparams)
         fd.writeframes(frame_bytes)
 
-def embed_file_to_wave(wavefilepath, filepath):
+def embed_file_to_wave(wavefilepath, filepath, ofilename):
     wdir = os.path.dirname(wavefilepath)
     basename = os.path.basename(wavefilepath)
-    ofilename = basename.split('.')[0]+'_embedded.wav'
     params, framebytes = framebytes_from_wave(wavefilepath)
     f = open(filepath, 'rb')
     data = f.read()
     f.close()
     modified_frames = embed_data_to_frame(framebytes, data)
-    framebytes_to_file(os.path.join(wdir, ofilename), params, modified_frames)
+    if modified_frames is not None:
+        framebytes_to_file(os.path.join(wdir, ofilename), params, modified_frames)
 
 def extract_file_from_wave(wavefilepath, ofilename):
     wdir = os.path.dirname(wavefilepath)
@@ -94,20 +99,22 @@ def extractDataFromFrame(frame_bytes):
     sys.stdout.flush()
     sys.stdout.write('\b'*10)
     while True:
-        last_bits = [frames.__next__() & 1 for i in range(9)]
+        last_bits = itertools.islice(frames, 0, 9)
         binstr = ''
         extracted_bytes+=1
         size, label = format_bytes(extracted_bytes)
         showbytes = f'{size:7.2f} {label}'
         sys.stdout.write("%s" % (showbytes))
         sys.stdout.flush()
-        sys.stdout.write('\b'*len(showbytes))
-        for i in range(0, 8):
-            binval = str(last_bits[i])
+        for i, b in zip(range(0, 8), last_bits):
+            binval = str(b&1)
             binstr+=binval
 
         data += bytes([int(binstr, 2)])
-        if last_bits[-1] == 1:
+        last_bit = last_bits.__next__()
+        if last_bit == 1:
+            sys.stdout.write('\n')
             return data
+        sys.stdout.write('\b'*len(showbytes))
 
 
