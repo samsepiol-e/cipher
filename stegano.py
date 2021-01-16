@@ -17,27 +17,22 @@ def modPix(pix, data):
     for i in range(lendata):
         pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
         for j in range(0, 8):
-            bump = int(datalist[i][j])^(pix[j]%2)
-            pix[j] -= bump
-            pix[j] = abs(pix[j])
-#            if (datalist[i][j] == '0' and pix[j]% 2 != 0):
-#                pix[j] -= 1
-#
-#            elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
-#                if(pix[j] != 0):
-#                    pix[j] -= 1
-#                else:
-#                    pix[j] += 1
+            pix[j] = (pix[j] & 254) | int(datalist[i][j])
+            #bump = int(datalist[i][j])^(pix[j]%2)
+            #pix[j] -= bump
+            #pix[j] = abs(pix[j])
         if (i == lendata - 1):
-            if (pix[-1] % 2 == 0):
-                if(pix[-1] != 0):
-                    pix[-1] -= 1
-                else:
-                    pix[-1] += 1
+            pix[-1] = pix[-1] & 254 | 1
+#            if (pix[-1] % 2 == 0):
+#                if(pix[-1] != 0):
+#                    pix[-1] -= 1
+#                else:
+#                    pix[-1] += 1
 
         else:
-            if (pix[-1] % 2 != 0):
-                pix[-1] -= 1
+            pix[-1] = pix[-1] & 254
+#            if (pix[-1] % 2 != 0):
+#                pix[-1] -= 1
 
         pix = tuple(pix)
         yield pix[0:3]
