@@ -28,7 +28,6 @@ def main():
         if choice == '3':
             break
         print('-'*60)
-        print('-'*60)
 #        print('Please choose Image/Audio File')
 #        ifabspath = askopenfilename()
         
@@ -43,7 +42,7 @@ def main():
         ifiledir = os.path.dirname(ifabspath)
         ifileinfo = ifilename.split('.')
         randsuffix = str(uuid.uuid4())
-        #Tk().destroy()
+        Tk().destroy()
         if ifileinfo[1].lower() in ['jpg', 'jpeg', 'gif', 'png']:
             fileext = '.png'
             fformat = 'i'
