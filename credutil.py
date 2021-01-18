@@ -58,7 +58,7 @@ def main():
                 username = input('Please enter username : ')
                 if choice == '1':
                     password = input('Please enter your password : ')
-                    new_credential(fabspath, section, username, False, password)
+                    new_credential(fabspath, section, username, False, password=password)
                 elif choice == '2':
                     passlen = input('Please enter your password length (Default is 16) : ')
                     if passlen == '':
