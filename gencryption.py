@@ -7,7 +7,13 @@ from tkinter import ttk
 import tkinter.filedialog as fd 
 
 def new_password():
-    password = generate_password(16)
+    passlen = passlene.get()
+    if passlen == '':
+        passlen = 16
+    else:
+        passlen = int(passlen)
+    passexclude = passexe.get()
+    password = generate_password(passlen, passexclude)
     passentry.delete(0, tk.END)
     passentry.insert(tk.END, password)
 
@@ -24,6 +30,9 @@ def add_cred():
     with open(fabspath, 'w') as f:
         config.write(f)
     _readfile(fabspath)
+    secentry.delete(0, tk.END)
+    userentry.delete(0, tk.END)
+    passentry.delete(0, tk.END)
 
 def openembedfile():
     ifilepath.delete(0, tk.END)
@@ -42,10 +51,12 @@ def opendatafile():
     filepath.insert(tk.END, fabspath)
 
 def _readfile(fabspath):
+    mylist.delete(0, tk.END)
     f = open(fabspath, 'rb')
     c = f.read()
     f.close()
-    filecontent.set(c)
+    mylist.insert(tk.END, *c.splitlines())
+    #filecontent.set(c)
 
 def enc():
     fabspath = filepath.get()
@@ -69,7 +80,7 @@ def dec():
 master = tk.Tk()
 master.title('3ncryp710n T00lz')
 statuslabel = tk.StringVar()
-filecontent = tk.StringVar()
+#filecontent = tk.StringVar()
 width = 900
 height = 500
 screen_width = master.winfo_screenwidth()
@@ -80,10 +91,17 @@ master.geometry(f'{width}x{height}+{x}+{y}')
 tk.Label(master, text="Data File").grid(row=0)
 tk.Label(master, text="Encryption Key").grid(row=1)
 tk.Label(master, textvariable=statuslabel).grid(row=2, column = 1, sticky=tk.W)
-tk.Label(master, textvariable=filecontent, height = 10, wraplength = 300, justify = 'left').grid(row=2, column = 1)
+myscroll = tk.Scrollbar(master)
+myscroll.grid(row=3, column = 2)
+#myscroll.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
+mylist = tk.Listbox(master, yscrollcommand = myscroll.set)
+mylist.grid(row=3, column = 1)
+#mylist.pack(side = tk.LEFT, fill = Y, expand = False)
+myscroll.config( command = mylist.yview )
+
+#tk.Label(master, textvariable=filecontent, height = 10, wraplength = 300, justify = 'left').grid(row=2, column = 1)
 #mycanvas = tk.Canvas(master)
 #myframe = tk.Frame(mycanvas)
-#myscroll = tk.Scrollbar(myframe, orient='vertical', command=mycanvas.yview)
 #mycanvas.configure(yscrollcommand=myscroll.set)
 #mycanvas.create_window(0, 0, window=myframe, anchor='nw')
 #mycanvas.grid(row = 3, column = 1)
@@ -100,17 +118,25 @@ tk.Label(master, text="Credential").grid(row=15)
 tk.Label(master, text="Section").grid(row=14, column = 1)
 tk.Label(master, text="Username").grid(row=14, column = 2)
 tk.Label(master, text="Password").grid(row=14, column = 3)
+tk.Label(master, text="Password Length").grid(row=17, column = 0)
+tk.Label(master, text="Password Exclude").grid(row=18, column = 0)
 filepath = tk.Entry(master)
 keyentry = tk.Entry(master)
 secentry = tk.Entry(master)
 userentry = tk.Entry(master)
 passentry = tk.Entry(master)
+passlene = tk.Entry(master)
+passexe = tk.Entry(master)
 
 filepath.grid(row=0, column=1)
 keyentry.grid(row=1, column=1)
 secentry.grid(row=15, column = 1)
 userentry.grid(row=15, column = 2)
 passentry.grid(row=15, column = 3)
+passlene.grid(row = 17, column = 1)
+passexe.grid(row = 18, column = 1)
+passlene.insert(tk.END, '16')
+passexe.insert(tk.END, '%')
 
 tk.Button(master, text = 'Generate Password', command = new_password).grid(row=16, column =0)
 tk.Button(master, text = 'Add Password', command = add_cred).grid(row=16, column =1)
@@ -118,7 +144,7 @@ tk.Button(master, text = 'Add Password', command = add_cred).grid(row=16, column
 tk.Button(master, text = 'Browse', command = opendatafile).grid(row=0, column =2)
 tk.Button(master, bg = 'red', text='Encrypt', command=enc).grid(row=10, column=1, sticky=tk.W, pady=4)
 tk.Button(master, bg = 'green', text='Decrypt', command=dec).grid(row=10, column=2, sticky=tk.W, pady=4)
-tk.Button(master, text='Quit', command=master.quit).grid(row=17, column=0, sticky=tk.W, pady=4)
+tk.Button(master, text='Quit', command=master.quit).grid(row=19, column=0, sticky=tk.W, pady=4)
 
 tk.mainloop()
 
