@@ -81,7 +81,7 @@ master = tk.Tk()
 master.title('3ncryp710n T00lz')
 statuslabel = tk.StringVar()
 #filecontent = tk.StringVar()
-width = 900
+width = 600
 height = 500
 screen_width = master.winfo_screenwidth()
 screen_height = master.winfo_screenheight()
@@ -92,10 +92,10 @@ tk.Label(master, text="Data File").grid(row=0)
 tk.Label(master, text="Encryption Key").grid(row=1)
 tk.Label(master, textvariable=statuslabel).grid(row=2, column = 1, sticky=tk.W)
 myscroll = tk.Scrollbar(master)
-myscroll.grid(row=3, column = 2)
+myscroll.grid(row=3, column = 2, sticky='nw')
 #myscroll.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
-mylist = tk.Listbox(master, yscrollcommand = myscroll.set)
-mylist.grid(row=3, column = 1)
+mylist = tk.Listbox(master, yscrollcommand = myscroll.set, width = 50)
+mylist.grid(row=3, column = 1, columnspan=3, sticky=tk.W)
 #mylist.pack(side = tk.LEFT, fill = Y, expand = False)
 myscroll.config( command = mylist.yview )
 
@@ -115,115 +115,38 @@ myscroll.config( command = mylist.yview )
 #tk.Label(master, textvariable=filecontent, height = 7, wraplength = 300, justify = 'left').grid(row=3, column = 1)
 
 tk.Label(master, text="Credential").grid(row=15)
-tk.Label(master, text="Section").grid(row=14, column = 1)
-tk.Label(master, text="Username").grid(row=14, column = 2)
-tk.Label(master, text="Password").grid(row=14, column = 3)
+tk.Label(master, text="Section").grid(row=14, column = 1, sticky=tk.W)
+tk.Label(master, text="Username").grid(row=14, column = 2, sticky=tk.W)
+tk.Label(master, text="Password").grid(row=19)#, column = 0, sticky=tk.W)
 tk.Label(master, text="Password Length").grid(row=17, column = 0)
 tk.Label(master, text="Password Exclude").grid(row=18, column = 0)
 filepath = tk.Entry(master)
 keyentry = tk.Entry(master)
 secentry = tk.Entry(master)
 userentry = tk.Entry(master)
-passentry = tk.Entry(master)
+passentry = tk.Entry(master, width = 40)
 passlene = tk.Entry(master)
 passexe = tk.Entry(master)
 
-filepath.grid(row=0, column=1)
-keyentry.grid(row=1, column=1)
-secentry.grid(row=15, column = 1)
-userentry.grid(row=15, column = 2)
-passentry.grid(row=15, column = 3)
-passlene.grid(row = 17, column = 1)
-passexe.grid(row = 18, column = 1)
+filepath.grid(row=0, column=1, sticky=tk.W)
+keyentry.grid(row=1, column=1, sticky=tk.W)
+secentry.grid(row=15, column = 1, sticky=tk.W)
+userentry.grid(row=15, column = 2, sticky=tk.W)
+passentry.grid(row=19, column = 1, sticky=tk.W, columnspan = 2)
+passlene.grid(row = 17, column = 1, sticky=tk.W)
+passexe.grid(row = 18, column = 1, sticky=tk.W)
 passlene.insert(tk.END, '16')
 passexe.insert(tk.END, '%')
 
-tk.Button(master, text = 'Generate Password', command = new_password).grid(row=16, column =0)
-tk.Button(master, text = 'Add Password', command = add_cred).grid(row=16, column =1)
+tk.Button(master, text = 'Generate Password', command = new_password).grid(row=16, column =1, sticky=tk.W, pady = 4)
+tk.Button(master, text = 'Add Password', command = add_cred).grid(row=16, column =2, sticky=tk.W, pady = 4)
 
-tk.Button(master, text = 'Browse', command = opendatafile).grid(row=0, column =2)
+tk.Button(master, text = 'Browse', command = opendatafile, bd = 7).grid(row=0, column =2, sticky=tk.W)
 tk.Button(master, bg = 'red', text='Encrypt', command=enc).grid(row=10, column=1, sticky=tk.W, pady=4)
 tk.Button(master, bg = 'green', text='Decrypt', command=dec).grid(row=10, column=2, sticky=tk.W, pady=4)
-tk.Button(master, text='Quit', command=master.quit).grid(row=19, column=0, sticky=tk.W, pady=4)
+tk.Button(master, text='Quit', command=master.quit).grid(row=20, column=0, sticky=tk.W, pady=4)
+master.grid_columnconfigure(5, weight = 2)
+master.grid_columnconfigure(4, weight = 2)
 
 tk.mainloop()
 
-#def main():
-#    while True:
-#        print('-'*60)
-#        print('''
-#        1. Encrypt File and Embed Data
-#        2. Extract Data and Decrypt
-#        3. Exit
-#        ''')
-#        choice = input(' What Would you like to do? : ')
-#        if choice == '3':
-#            break
-#        print('-'*60)
-##        print('Please choose Image/Audio File')
-##        ifabspath = askopenfilename()
-#        
-#        Tk().withdraw()
-#        ifabspath = askopenfilename(
-#                filetypes = [
-#                    ('Accepted Formats', '.wav .jpg, .jpeg .gif .png'),
-#                    ],
-#                title = 'Please choose Image/Audio File',
-#                )
-#        ifilename = os.path.basename(ifabspath)
-#        ifiledir = os.path.dirname(ifabspath)
-#        ifileinfo = ifilename.split('.')
-#        randsuffix = str(uuid.uuid4())
-#        Tk().destroy()
-#        if ifileinfo[1].lower() in ['jpg', 'jpeg', 'gif', 'png']:
-#            fileext = '.png'
-#            fformat = 'i'
-#        elif ifileinfo[1].lower() not in ['wav']:
-#            print('Invalid file chosen')
-#            continue
-#        else:
-#            fileext = '.wav'
-#            fformat = 'a'
-#
-#        ofilename = ifileinfo[0]+'_'+randsuffix+fileext
-#            
-#        key = input('Please enter your encryption key : ')
-#        
-#        print('-'*60)
-#        if choice == '1':
-#            #print('Please choose Data File')
-#            #fabspath = askopenfilename()
-#            Tk().withdraw()
-#            fabspath=askopenfilename(title='Please choose Data File')
-#            Tk().destroy()
-#            encryptfile(key, fabspath, fabspath)
-#            if fformat == 'i':
-#                embed_data_from_file(ifabspath, fabspath, ofilename)
-#            elif fformat == 'a':
-#                embed_file_to_wave(ifabspath, fabspath, ofilename)
-#            os.remove(fabspath)
-#
-#        elif choice == '2':
-#            while True:
-#                filename = input('Please enter filename for your extracted file : ')
-#                fabspath = os.path.join(ifiledir, filename)
-#                if os.path.isfile(fabspath):
-#                    rmfile = input('File Already Exists, Would you like to override it? (Y/n) : ')
-#                    if rmfile in ['', 'Y', 'y']:
-#                        os.remove(fabspath)
-#                        break
-#                    else:
-#                        print('Please choose a different file name')
-#                        continue
-#                else:
-#                    break
-#
-#            if fformat == 'i':
-#                extract_data_from_file(ifabspath, filename)
-#            elif fformat == 'a':
-#                extract_file_from_wave(ifabspath, filename)
-#            decryptfile(key, fabspath, fabspath)
-#            os.remove(ifabspath)
-#
-#if __name__ == '__main__':
-#    main()
