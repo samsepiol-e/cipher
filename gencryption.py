@@ -42,10 +42,12 @@ def opendatafile():
     filepath.insert(tk.END, fabspath)
 
 def _readfile(fabspath):
+    mylist.delete(0, tk.END)
     f = open(fabspath, 'rb')
     c = f.read()
     f.close()
-    filecontent.set(c)
+    mylist.insert(tk.END, *c.splitlines())
+    #filecontent.set(c)
 
 def enc():
     fabspath = filepath.get()
@@ -69,7 +71,7 @@ def dec():
 master = tk.Tk()
 master.title('3ncryp710n T00lz')
 statuslabel = tk.StringVar()
-filecontent = tk.StringVar()
+#filecontent = tk.StringVar()
 width = 900
 height = 500
 screen_width = master.winfo_screenwidth()
@@ -80,10 +82,17 @@ master.geometry(f'{width}x{height}+{x}+{y}')
 tk.Label(master, text="Data File").grid(row=0)
 tk.Label(master, text="Encryption Key").grid(row=1)
 tk.Label(master, textvariable=statuslabel).grid(row=2, column = 1, sticky=tk.W)
-tk.Label(master, textvariable=filecontent, height = 10, wraplength = 300, justify = 'left').grid(row=2, column = 1)
+myscroll = tk.Scrollbar(master)
+myscroll.grid(row=3, column = 2)
+#myscroll.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
+mylist = tk.Listbox(master, yscrollcommand = myscroll.set)
+mylist.grid(row=3, column = 1)
+#mylist.pack(side = tk.LEFT, fill = Y, expand = False)
+myscroll.config( command = mylist.yview )
+
+#tk.Label(master, textvariable=filecontent, height = 10, wraplength = 300, justify = 'left').grid(row=2, column = 1)
 #mycanvas = tk.Canvas(master)
 #myframe = tk.Frame(mycanvas)
-#myscroll = tk.Scrollbar(myframe, orient='vertical', command=mycanvas.yview)
 #mycanvas.configure(yscrollcommand=myscroll.set)
 #mycanvas.create_window(0, 0, window=myframe, anchor='nw')
 #mycanvas.grid(row = 3, column = 1)
