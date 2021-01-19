@@ -20,13 +20,25 @@ def opendatafile():
     filepath.delete(0, tk.END)
     fabspath = fd.askopenfilename(title = 'Please choose Data File')
     filepath.insert(tk.END, fabspath)
+    _readfile()
+
+def _readfile():
+    fabspath = filepath.get()
+    mlist.delete(0, tk.END)
+    if var1.get() == 1:
+        f = open(fabspath, 'rb')
+        c = f.read()
+        f.close()
+        mlist.insert(tk.END, *c.splitlines())
 
 def enc_and_embed():
+    cur_status.config(bg='red')
     fabspath = filepath.get()
     key = keyentry.get()
     ifabspath = ifilepath.get()
     ifileinfo = os.path.basename(ifabspath).split('.')
     ofilename = ifileinfo[0]+'_'+str(uuid.uuid4())
+    fdir = os.path.dirname(ifabspath)
     fabspath = filepath.get()
     statuslabel.set('Encrypting File')
     encryptfile(key, fabspath, fabspath)
@@ -39,15 +51,24 @@ def enc_and_embed():
         embed_file_to_wave(ifabspath, fabspath, ofilename)
     os.remove(fabspath)
     statuslabel.set('Embedding and Encrypted Done!')
+    cur_status.config(bg='green')
     filepath.delete(0, tk.END)
     ifilepath.delete(0, tk.END)
+    mlist.delete(0, tk.END)
+    ofpath = os.path.join(fdir, ofilename)
+    ifilepath.insert(tk.END, ofpath)
 
 def extract_and_decrypt():
+    cur_status.config(bg='red')
     key = keyentry.get()
     ifabspath = ifilepath.get()
     ifileinfo = os.path.basename(ifabspath).split('.')
     f = fd.asksaveasfile('wb')
+    filepath.delete(0, tk.END)
+    filepath.insert(tk.END, f.name)
+    fabspath = filepath.get()
     statuslabel.set('Extracting Data...')
+    cur_status.config(bg='green')
     if ifileinfo[1].lower() == 'wav':
         data = extract_data_from_wave(ifabspath)
     else:
@@ -59,17 +80,16 @@ def extract_and_decrypt():
     f.close()
     os.remove(ifabspath)
     statuslabel.set('Extraction and Decryption Done!')
+    _readfile()
     ifilepath.delete(0, tk.END)
 
 
-def show_entry_fields():
-    print("First Name: %s\nLast Name: %s" % (e1.get(), e2.get()))
 
 master = tk.Tk()
 master.title('C1ph3r T00lz')
 statuslabel = tk.StringVar()
 width = 400
-height = 200
+height = 400
 screen_width = master.winfo_screenwidth()
 screen_height = master.winfo_screenheight()
 x = (screen_width//2) - (width//2)
@@ -78,7 +98,17 @@ master.geometry(f'{width}x{height}+{x}+{y}')
 tk.Label(master, text="Image/Audio File").grid(row=0)
 tk.Label(master, text="Data File").grid(row=1)
 tk.Label(master, text="Encryption Key").grid(row=2)
-tk.Label(master, textvariable=statuslabel).grid(row=3, column = 1, sticky=tk.W)
+
+var1 = tk.IntVar(master)
+cb = tk.Checkbutton(master, text="Output", variable=var1, onvalue = 1, offvalue = 0, command = _readfile)
+cb.grid(row=4, column = 0, sticky=tk.NW)
+cur_status = tk.Label(master, textvariable=statuslabel)
+cur_status.grid(row=3, column = 1, sticky=tk.W)
+sbar = tk.Scrollbar(master)
+sbar.grid(row=4, column = 2)
+mlist = tk.Listbox(master, yscrollcommand=sbar.set)
+mlist.grid(row = 4, column = 1)
+sbar.config(command = mlist.yview)
 
 ifilepath = tk.Entry(master)
 filepath = tk.Entry(master)
@@ -88,11 +118,13 @@ ifilepath.grid(row=0, column=1)
 filepath.grid(row=1, column=1)
 keyentry.grid(row=2, column=1)
 
-tk.Button(master, text = 'Browse', command = openembedfile).grid(row=0, column =2)
+tk.Button(master, text = 'Browse', command = openembedfile).grid(row=0, column =2, sticky=tk.E)
 tk.Button(master, text = 'Browse', command = opendatafile).grid(row=1, column =2)
-tk.Button(master, bg = 'red', text='Encrypt and Embed', command=enc_and_embed).grid(row=5, column=0, sticky=tk.W, pady=4)
-tk.Button(master, bg = 'green', text='Extract and Decrypt', command=extract_and_decrypt).grid(row=5, column=1, sticky=tk.W, pady=4)
-tk.Button(master, text='Quit', command=master.quit).grid(row=5, column=2, sticky=tk.W, pady=4)
+b1 = tk.Button(master, text='Encrypt and Embed', command=enc_and_embed)
+b1.grid(row=10, column=0, sticky=tk.W, pady=4)
+b2=tk.Button(master, text='Extract and Decrypt', command=extract_and_decrypt)
+b2.grid(row=10, column=1, sticky=tk.W, pady=4)
+tk.Button(master, text='Quit', command=master.quit).grid(row=10, column=2, sticky=tk.W, pady=4)
 
 tk.mainloop()
 
