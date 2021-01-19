@@ -39,6 +39,8 @@ def _encryptfile():
     encryptfile(key, fabspath, fabspath)
     statuslabel.set('Encrypted!')
     cur_status.config(bg='green')
+    ofilename = os.path.basename(fabspath)
+    ofilelabel.set(f'{ofilename}')
     _readfile()
 
 def _decryptfile():
@@ -49,6 +51,8 @@ def _decryptfile():
     decryptfile(key, fabspath, fabspath)
     statuslabel.set('Decrypted!')
     cur_status.config(bg='green')
+    ofilename = os.path.basename(fabspath)
+    ofilelabel.set(f'{ofilename}')
     _readfile()
 
 def _embedfile():
@@ -66,12 +70,12 @@ def _embedfile():
         ofilename += '.wav'
         embed_file_to_wave(ifabspath, fabspath, ofilename)
     os.remove(fabspath)
-    statuslabel.set('Embedded File!')
+    statuslabel.set('Data Embedded!')
+    ofilelabel.set(f'{ofilename}')
     cur_status.config(bg='green')
     filepath.delete(0, tk.END)
     ifilepath.delete(0, tk.END)
-    cb.deselect()
-    #mlist.delete(0, tk.END)
+    mlist.delete(0, tk.END)
     ofpath = os.path.join(fdir, ofilename)
     ifilepath.insert(tk.END, ofpath)
 
@@ -94,6 +98,8 @@ def _extractfile():
     f.write(data)
     f.close()
     cur_status.config(bg='green')
+    ofilename = os.path.basename(fabspath)
+    ofilelabel.set(f'{ofilename}')
     _readfile()
     ifilepath.delete(0, tk.END)
 
@@ -110,10 +116,12 @@ def extract_and_decrypt():
 
 
 master = tk.Tk()
+master.resizable(False, False)
 master.title('C1ph3r T00lz')
 statuslabel = tk.StringVar()
+ofilelabel = tk.StringVar()
 width = 500
-height = 400
+height = 450
 screen_width = master.winfo_screenwidth()
 screen_height = master.winfo_screenheight()
 x = (screen_width//2) - (width//2)
@@ -122,28 +130,32 @@ master.geometry(f'{width}x{height}+{x}+{y}')
 tk.Label(master, text="Image/Audio File").grid(row=0)
 tk.Label(master, text="Data File").grid(row=1)
 tk.Label(master, text="Encryption Key").grid(row=2)
+tk.Label(master, text="Status").grid(row=3)
+tk.Label(master, text="Output File").grid(row=4)
 
 var1 = tk.IntVar(master)
-cb = tk.Checkbutton(master, text="Output", variable=var1, onvalue = 1, offvalue = 0, command = _readfile)
-cb.grid(row=4, column = 0, sticky=tk.NW)
+cb = tk.Checkbutton(master, text="View File", variable=var1, onvalue = 1, offvalue = 0, command = _readfile)
+cb.grid(row=5, column = 0, sticky=tk.NW)
 cur_status = tk.Label(master, textvariable=statuslabel)
-cur_status.grid(row=3, column = 2, sticky=tk.W)
+cur_status.grid(row=3, column = 1, sticky=tk.W, columnspan = 2)
+ofilel = tk.Label(master, textvariable=ofilelabel)
+ofilel.grid(row=4, column = 1, sticky=tk.W, columnspan = 2)
 sbar = tk.Scrollbar(master)
-sbar.grid(row=4, column = 3, sticky = tk.W)
+sbar.grid(row=5, column = 3, sticky = tk.W)
 mlist = tk.Listbox(master, yscrollcommand=sbar.set)
-mlist.grid(row = 4, column = 1, columnspa = 2)
+mlist.grid(row = 5, column = 1, columnspa = 2, sticky = tk.W)
 sbar.config(command = mlist.yview)
 
 ifilepath = tk.Entry(master)
 filepath = tk.Entry(master)
-keyentry = tk.Entry(master)
+keyentry = tk.Entry(master, show = '*')
 
-ifilepath.grid(row=0, column=1, columnspan = 2)
-filepath.grid(row=1, column=1, columnspan = 2)
-keyentry.grid(row=2, column=1, columnspan = 2)
+ifilepath.grid(row=0, column=1, columnspan = 2, sticky = tk.W)
+filepath.grid(row=1, column=1, columnspan = 2, sticky = tk.W)
+keyentry.grid(row=2, column=1, columnspan = 2, sticky = tk.W)
 
-tk.Button(master, text = 'Browse', command = openembedfile).grid(row=0, column =3)
-tk.Button(master, text = 'Browse', command = opendatafile).grid(row=1, column =3)
+tk.Button(master, text = 'Browse', command = openembedfile).grid(row=0, column =3, sticky=tk.W)
+tk.Button(master, text = 'Browse', command = opendatafile).grid(row=1, column =3, sticky=tk.W)
 
 tk.Button(master, text='Encrypt', command=_encryptfile).grid(row=10, column = 1, sticky=tk.W, pady = 4)
 tk.Button(master, text='Embed', command=_embedfile).grid(row=11, column = 1, sticky=tk.W, pady = 4)
