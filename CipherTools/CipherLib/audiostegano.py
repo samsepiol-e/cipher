@@ -1,4 +1,4 @@
-from stegano import dataToBin
+from CipherLib.stegano import dataToBin
 import os
 import wave
 import sys
