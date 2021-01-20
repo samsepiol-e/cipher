@@ -1,8 +1,7 @@
 from setuptools import setup
-from Cred.__main__ import main
 setup(
     name="StegCipher Tools",
-    version="0.0.3",
+    version="0.0.4",
     description="Collection of lib and GUI tool for steganography/manage/encrypt/decrypt your credentials.",
     #long_description=README,
     #long_description_content_type="text/markdown",
