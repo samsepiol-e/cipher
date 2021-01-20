@@ -22,6 +22,6 @@ setup(
     ],
     entry_points={"console_scripts": [
         "credtools=Cred.__main__:main",
-        #"stegtools=Steg.__main__:main"
+        "stegtools=Steg.__main__:main"
         ]},
 )
