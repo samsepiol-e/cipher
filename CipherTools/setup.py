@@ -2,7 +2,7 @@ from setuptools import setup
 from Cred.__main__ import main
 setup(
     name="StegCipher Tools",
-    version="0.0.2",
+    version="0.0.3",
     description="Collection of lib and GUI tool for steganography/manage/encrypt/decrypt your credentials.",
     #long_description=README,
     #long_description_content_type="text/markdown",
@@ -18,7 +18,7 @@ setup(
     packages=["CipherLib"],
     include_package_data=True,
     install_requires=[
-        "pybase64", "pycrypto", "pillow"
+        "pybase64", "pycrypto", "pillow", 'pyperclip'
     ],
     entry_points={"console_scripts": [
         "credtools=Cred.__main__:main",
