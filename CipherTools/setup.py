@@ -1,12 +1,11 @@
 from setuptools import setup
-from Cred.__main__ import main
 setup(
-    name="Cipher Tools",
-    version="0.0.2",
+    name="StegCipher Tools",
+    version="0.0.4",
     description="Collection of lib and GUI tool for steganography/manage/encrypt/decrypt your credentials.",
     #long_description=README,
     #long_description_content_type="text/markdown",
-    #url="https://github.com/realpython/reader",
+    url="https://github.com/samsepiol-e/cipher",
     author="Sam Sepiol",
     author_email="0.alicegawa@gmail.com",
     license="MIT",
@@ -18,7 +17,7 @@ setup(
     packages=["CipherLib"],
     include_package_data=True,
     install_requires=[
-        "pybase64", "pycrypto", "pillow"
+        "pybase64", "pycrypto", "pillow", 'pyperclip'
     ],
     entry_points={"console_scripts": [
         "credtools=Cred.__main__:main",

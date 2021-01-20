@@ -4,6 +4,7 @@ import configparser
 import tkinter as tk
 import tkinter.filedialog as fd
 import os
+import pyperclip
 
 
 class CredGui():
@@ -70,6 +71,7 @@ class CredGui():
 
         tk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=16, column =1, sticky=tk.W, pady = 4)
         tk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=16, column =2, sticky=tk.W, pady = 4)
+        tk.Button(self.master, text = 'Get Password', command = self.copy_passwd).grid(row=19, column =3, sticky=tk.W, pady = 4)
 
         tk.Button(self.master, text = 'Browse', command = self.opendatafile, bd = 7).grid(row=0, column =2, sticky=tk.W)
         tk.Button(self.master, bg = 'red', text='Encrypt', command=self.enc).grid(row=10, column=1, sticky=tk.W, pady=4)
@@ -107,6 +109,21 @@ class CredGui():
         self.secentry.delete(0, tk.END)
         self.userentry.delete(0, tk.END)
         self.passentry.delete(0, tk.END)
+
+    def copy_passwd(self):
+        section = self.secentry.get()
+        username = self.userentry.get()
+        fabspath = self.filepath.get()
+        config = configparser.ConfigParser()
+        config.read(fabspath)
+        if not section in config.sections():
+            return 1
+        password = config[section][username]
+        pyperclip.copy(password)
+        self.statuslabel.set('Password Copied to Clipboard')
+        self._readfile(fabspath)
+        self.passentry.delete(0, tk.END)
+        self.passentry.insert(tk.END, password)
 
     def openembedfile(self):
         iself.filepath.delete(0, tk.END)
