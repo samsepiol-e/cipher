@@ -6,7 +6,7 @@ setup(
     description="Collection of lib and GUI tool for steganography/manage/encrypt/decrypt your credentials.",
     #long_description=README,
     #long_description_content_type="text/markdown",
-    #url="https://github.com/realpython/reader",
+    url="https://github.com/samsepiol-e/cipher",
     author="Sam Sepiol",
     author_email="0.alicegawa@gmail.com",
     license="MIT",
