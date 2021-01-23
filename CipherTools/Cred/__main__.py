@@ -53,7 +53,7 @@ class CredGui():
         self.userentry = tk.Entry(self.master)
         self.secentry.grid(row=17, column = 1, sticky=tk.W)
         self.userentry.grid(row=17, column = 2, sticky=tk.W)
-        tk.Button(self.master, text = 'Get Password', command = self.copy_passwd).grid(row=17, column =3, sticky=tk.W)
+        tk.Button(self.master, text = 'Copy Password', command = self.copy_passwd).grid(row=17, column =3, sticky=tk.W)
 
 
         tk.Label(self.master, text="Password").grid(row=18)#, column = 0, sticky=tk.W)
@@ -77,10 +77,13 @@ class CredGui():
         self.master.bind('<Control-e>', lambda event: self.enc())
         self.master.bind('<Control-d>', lambda event: self.dec())
         self.master.bind('<Control-c>', lambda event: self.copy_passwd())
+        self.master.bind('<Control-v>', lambda event: self.paste_passwd())
         self.master.bind('<Control-g>', lambda event: self.new_password())
         self.master.bind('<Control-a>', lambda event: self.add_cred())
         self.master.bind('<Control-q>', lambda event: self.master.quit())
         self.master.bind('<Control-l>', lambda event: self.clear())
+        self.master.bind('<Control-r>', lambda event: self.del_cred())
+        self.master.bind('<Control-f>', lambda event: self.searchentry.focus_set())
         self.searchentry.bind('<Key>', self.search)
         self.searchentry.bind('<FocusIn>', self.search)
         self.master.bind('<<ListboxSelect>>', self.lbselect)
@@ -109,15 +112,19 @@ class CredGui():
         config.read(fabspath)
         if not section in config.sections():
             config.add_section(section)
-        config[section][username] = password
-        with open(fabspath, 'w') as f:
-            config.write(f)
-        self.statuslabel.set('Credential added')
-        self.status.config(bg = 'green')
-        self._readfile(fabspath)
-        self.secentry.delete(0, tk.END)
-        self.userentry.delete(0, tk.END)
-        self.passentry.delete(0, tk.END)
+        if username == '':
+            self.statuslabel.set('Username empty, please fillin.')
+            self.status.config(bg = 'red')
+        else:
+            config[section][username] = password
+            with open(fabspath, 'w') as f:
+                config.write(f)
+            self.statuslabel.set('Credential added')
+            self.status.config(bg = 'green')
+            self._readfile(fabspath)
+            self.userentry.delete(0, tk.END)
+            self.passentry.delete(0, tk.END)
+            self.search(None)
 
     def lbselect(self, event):
         def _bytes_to_str(b):
@@ -126,28 +133,29 @@ class CredGui():
             return b
 
         idx_t = self.mylist.curselection()
-        idx = idx_t[0]
-        kv = self.mylist.get(idx_t)
-        kv = _bytes_to_str(kv)
-        self.secentry.delete(0, tk.END)
-        self.userentry.delete(0, tk.END)
-        self.passentry.delete(0, tk.END)
-        if kv != '':
-            if kv[0] == '[':
-                self.secentry.insert(tk.END, kv[1:-1])
-            else:
-                kv_l = kv.split('=', 1)
-                key = kv_l[0].replace(' ', '')
-                val = kv_l[1].replace(' ', '')
-                while True:
-                    idx -= 1
-                    s = self.mylist.get((idx,))
-                    s = _bytes_to_str(s)
-                    if s[0] == '[':
-                        self.secentry.insert(tk.END, s[1:-1])
-                        self.userentry.insert(tk.END, key)
-                        self.passentry.insert(tk.END, val)
-                        break
+        if len(idx_t)>0:
+            idx = idx_t[0]
+            kv = self.mylist.get(idx_t)
+            kv = _bytes_to_str(kv)
+            self.secentry.delete(0, tk.END)
+            self.userentry.delete(0, tk.END)
+            self.passentry.delete(0, tk.END)
+            if kv != '':
+                if kv[0] == '[':
+                    self.secentry.insert(tk.END, kv[1:-1])
+                else:
+                    kv_l = kv.split('=', 1)
+                    key = kv_l[0].replace(' ', '')
+                    val = kv_l[1].replace(' ', '')
+                    while True:
+                        idx -= 1
+                        s = self.mylist.get((idx,))
+                        s = _bytes_to_str(s)
+                        if s[0] == '[':
+                            self.secentry.insert(tk.END, s[1:-1])
+                            self.userentry.insert(tk.END, key)
+                            self.passentry.insert(tk.END, val)
+                            break
 
     def del_cred(self):
         section = self.secentry.get()
@@ -159,7 +167,10 @@ class CredGui():
             self.statuslabel.set('No Credential Found')
             self.status.config(bg = 'red')
         else:
-            config.remove_option(section, username)
+            if username == '':
+                config.remove_section(section)
+            else:
+                config.remove_option(section, username)
         with open(fabspath, 'w') as f:
             config.write(f)
         self.statuslabel.set('Credential Removed')
@@ -168,6 +179,7 @@ class CredGui():
         self.secentry.delete(0, tk.END)
         self.userentry.delete(0, tk.END)
         self.passentry.delete(0, tk.END)
+        self.search(None)
 
     def clear(self):
         focus = self.master.focus_get()
@@ -179,61 +191,68 @@ class CredGui():
         buf = io.StringIO()
         searchkey = self.searchentry.get()
         p = re.compile(searchkey)
-        if searchkey == '':
-            self.config = configparser.ConfigParser()
-            fabspath = self.filepath.get()
-            self.config.read(fabspath)
-            self.config.write(buf)
-        else:
-            searchres = configparser.ConfigParser()
-            for section in self.config.sections():
-                res = p.search(section)
-                if res is not None:
-                    if not section in searchres.sections():
-                        searchres.add_section(section)
-                    for k, v in self.config.items(section):
-                        searchres[section][k] = v
-                else:
-                    for k, v in self.config.items(section):
-                        res = p.search(k)
-                        if res is not None:
-                            if not section in searchres.sections():
-                                searchres.add_section(section)
-                            searchres[section][k]=v
-            searchres.write(buf)
+        #if searchkey == '':
+        #    self.config = configparser.ConfigParser()
+        #    fabspath = self.filepath.get()
+        #    self.config.read(fabspath)
+        #    self.config.write(buf)
+        config = configparser.ConfigParser()
+        fabspath = self.filepath.get()
+        config.read(fabspath)
+        searchres = configparser.ConfigParser()
+        for section in config.sections():
+            res = p.search(section)
+            if res is not None:
+                if not section in searchres.sections():
+                    searchres.add_section(section)
+                for k, v in config.items(section):
+                    searchres[section][k] = v
+            else:
+                for k, v in config.items(section):
+                    res = p.search(k)
+                    if res is not None:
+                        if not section in searchres.sections():
+                            searchres.add_section(section)
+                        searchres[section][k]=v
+        searchres.write(buf)
         c = buf.getvalue()
         self.mylist.insert(tk.END, *c.splitlines())
         buf.close()
 
 
-    def copy_passwd(self):
-        section = self.secentry.get()
-        username = self.userentry.get()
-        fabspath = self.filepath.get()
-        config = configparser.ConfigParser()
-        config.read(fabspath)
-        if not section in config.sections():
-            self.statuslabel.set('Section Not Found')
-            self.label.config(bg='red')
-        else:
-            if not config.has_option(section, username):
-                self.statuslabel.set('Username Not Found')
-                self.label.config(bg='red')
-            else:
-                password = config[section][username]
-                pyperclip.copy(password)
-                self.statuslabel.set('Password Copied to Clipboard')
-                self.status.config(bg = 'green')
-                self._readfile(fabspath)
-                self.passentry.delete(0, tk.END)
-                self.passentry.insert(tk.END, password)
-
     def paste_passwd(self):
-        pyperclip.paste()
-        self.statuslabel.set('Password pasted from Clipboard')
-        self.status.config(bg = 'green')
+        passwd = pyperclip.paste()
         self.passentry.delete(0, tk.END)
-        self.passentry.insert(tk.END, password)
+        self.passentry.insert(tk.END, passwd)
+        self.status.config(bg='green')
+        self.statuslabel.set('Password Pasted From Clipboard')
+
+    def copy_passwd(self):
+        password = self.passentry.get()
+        pyperclip.copy(password)
+        self.status.config(bg='green')
+        self.statuslabel.set('Password Copied to Clipboard')
+        #section = self.secentry.get()
+        #username = self.userentry.get()
+        #fabspath = self.filepath.get()
+        #config = configparser.ConfigParser()
+        #config.read(fabspath)
+        #if not section in config.sections():
+        #    self.statuslabel.set('Section Not Found')
+        #    self.label.config(bg='red')
+        #else:
+        #    if not config.has_option(section, username):
+        #        self.statuslabel.set('Username Not Found')
+        #        self.label.config(bg='red')
+        #    else:
+        #        password = config[section][username]
+        #        pyperclip.copy(password)
+        #        self.statuslabel.set('Password Copied to Clipboard')
+        #        self.status.config(bg = 'green')
+        #        self._readfile(fabspath)
+        #        self.passentry.delete(0, tk.END)
+        #        self.passentry.insert(tk.END, password)
+
         
 
     def opendatafile(self):
