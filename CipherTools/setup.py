@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name="StegCipher Tools",
-    version="0.0.5",
+    version="0.0.6",
     description="Collection of lib and GUI tool for steganography/manage/encrypt/decrypt your credentials.",
     #long_description=README,
     #long_description_content_type="text/markdown",
