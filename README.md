@@ -64,11 +64,13 @@ Navigation
 
 ## Password Strength
 You can check strength of existing or generated password in password entry field by its color.
+```
 Sky Blue : Very Strong. Password contains all 3 alphabets, numeral, and numbers case sensitive.
 Light Green : Strong. Password contains all 3 alphabets, numeral, and numbers case insensitive.
 Yellow : Okay. Password contains 2 out of alphabets, numeral, and numbers case insensitive.
 Orange : Weak. Password contains 1 out of alphabets, numeral, and numbers case insensitive.
 Red : Very weak. Password is less than 6 letters long.
+```
 
 
 ## Encryption
