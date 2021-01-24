@@ -57,8 +57,10 @@ class CredGui():
 
 
         tk.Label(self.master, text="Password").grid(row=18)#, column = 0, sticky=tk.W)
-        self.passentry = tk.Entry(self.master, width = 40)
+        self.passvar = tk.StringVar()
+        self.passentry = tk.Entry(self.master, width = 40, textvariable=self.passvar)
         self.passentry.grid(row=18, column = 1, sticky=tk.W, columnspan = 2)
+        self.passvar.trace('w', self.check_passwd_strength)
 
         tk.Label(self.master, text="Password Length").grid(row=19, column = 1)
         tk.Label(self.master, text="Password Exclude").grid(row=19, column = 2)
@@ -66,8 +68,8 @@ class CredGui():
         self.passexe = tk.Entry(self.master)
         self.passlene.grid(row = 20, column = 1, sticky=tk.W)
         self.passexe.grid(row = 20, column = 2, sticky=tk.W)
-        self.passlene.insert(tk.END, '16')
-        self.passexe.insert(tk.END, '%')
+        self.passlene.insert(tk.END, '32')
+        self.passexe.insert(tk.END, r'%\()|{}[]:";' + "'" + '<>,./?')
         tk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=21, column =1, sticky=tk.W, pady = 4)
         tk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=21, column =2, sticky=tk.W, pady = 4)
 
@@ -102,6 +104,20 @@ class CredGui():
         password = generate_password(passlen, passexclude)
         self.passentry.delete(0, tk.END)
         self.passentry.insert(tk.END, password)
+
+    def check_passwd_strength(self, *args):
+        password = self.passentry.get()
+        if isinstance(password, bytes):
+            password = password.decode('utf-8')
+        passstr = get_pass_strength(password)
+        if passstr == 2:
+            self.passentry.config(bg = 'green')
+        elif passstr == 1:
+            self.passentry.config(bg = 'yellow')
+        elif passstr == 0:
+            self.passentry.config(bg = 'red')
+        else:
+            self.passentry.config(bg = 'grey')
 
     def add_cred(self):
         section = self.secentry.get()
