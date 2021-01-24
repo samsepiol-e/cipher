@@ -73,7 +73,7 @@ class CredGui():
         tk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=21, column =1, sticky=tk.W, pady = 4)
         tk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=21, column =2, sticky=tk.W, pady = 4)
 
-        tk.Button(self.master, text='Quit', command=self.master.quit).grid(row=22, column=3, sticky=tk.W, pady=4)
+        tk.Button(self.master, text='Encrypt and Quit', command=self.encrypt_and_quit).grid(row=22, column=3, sticky=tk.W, pady=4)
 
         self.master.bind('<Control-o>', lambda event: self.opendatafile())
         self.master.bind('<Control-e>', lambda event: self.enc())
@@ -82,7 +82,7 @@ class CredGui():
         self.master.bind('<Control-v>', lambda event: self.paste_passwd())
         self.master.bind('<Control-g>', lambda event: self.new_password())
         self.master.bind('<Control-a>', lambda event: self.add_cred())
-        self.master.bind('<Control-q>', lambda event: self.master.quit())
+        self.master.bind('<Control-q>', lambda event: self.encrypt_and_quit())
         self.master.bind('<Control-l>', lambda event: self.clear())
         self.master.bind('<Control-r>', lambda event: self.del_cred())
         self.master.bind('<Control-f>', lambda event: self.searchentry.focus_set())
@@ -93,6 +93,11 @@ class CredGui():
         self.mylist.bind('<Down>', self.lbselect)
 
         tk.mainloop()
+    
+    def encrypt_and_quit(self):
+        self.enc()
+        self.master.quit()
+
 
     def new_password(self):
         passlen = self.passlene.get()
