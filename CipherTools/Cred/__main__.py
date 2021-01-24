@@ -219,37 +219,42 @@ class CredGui():
             focus.delete(0, tk.END)
 
     def search(self, *args):
-        self.mylist.delete(0, tk.END)
-        buf = io.StringIO()
-        searchkey = self.searchentry.get()
-        p = re.compile(searchkey)
-        #if searchkey == '':
-        #    self.config = configparser.ConfigParser()
-        #    fabspath = self.filepath.get()
-        #    self.config.read(fabspath)
-        #    self.config.write(buf)
         config = configparser.ConfigParser()
         fabspath = self.filepath.get()
-        config.read(fabspath)
-        searchres = configparser.ConfigParser()
-        for section in config.sections():
-            res = p.search(section)
-            if res is not None:
-                if not section in searchres.sections():
-                    searchres.add_section(section)
-                for k, v in config.items(section):
-                    searchres[section][k] = v
-            else:
-                for k, v in config.items(section):
-                    res = p.search(k)
-                    if res is not None:
-                        if not section in searchres.sections():
-                            searchres.add_section(section)
-                        searchres[section][k]=v
-        searchres.write(buf)
-        c = buf.getvalue()
-        self.mylist.insert(tk.END, *c.splitlines())
-        buf.close()
+        try:
+            config.read(fabspath)
+        except:
+            self.statuslabel.set('File not in searchable format.')
+            self.status.config(bg='red')
+        else:
+            self.mylist.delete(0, tk.END)
+            buf = io.StringIO()
+            searchkey = self.searchentry.get()
+            p = re.compile(searchkey)
+            #if searchkey == '':
+            #    self.config = configparser.ConfigParser()
+            #    fabspath = self.filepath.get()
+            #    self.config.read(fabspath)
+            #    self.config.write(buf)
+            searchres = configparser.ConfigParser()
+            for section in config.sections():
+                res = p.search(section)
+                if res is not None:
+                    if not section in searchres.sections():
+                        searchres.add_section(section)
+                    for k, v in config.items(section):
+                        searchres[section][k] = v
+                else:
+                    for k, v in config.items(section):
+                        res = p.search(k)
+                        if res is not None:
+                            if not section in searchres.sections():
+                                searchres.add_section(section)
+                            searchres[section][k]=v
+            searchres.write(buf)
+            c = buf.getvalue()
+            self.mylist.insert(tk.END, *c.splitlines())
+            buf.close()
 
 
     def paste_passwd(self):
