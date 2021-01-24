@@ -309,13 +309,14 @@ class CredGui():
 
     def enc(self):
         fabspath = self.filepath.get()
-        key = self.keyentry.get()
-        self.statuslabel.set('Encrypting File')
-        self.status.config(bg = 'red')
-        encryptfile(key, fabspath, fabspath)
-        self.statuslabel.set('Encrypted!')
-        self.status.config(bg = 'green')
-        self._readfile(fabspath)
+        if fabspath != '':
+            key = self.keyentry.get()
+            self.statuslabel.set('Encrypting File')
+            self.status.config(bg = 'red')
+            encryptfile(key, fabspath, fabspath)
+            self.statuslabel.set('Encrypted!')
+            self.status.config(bg = 'green')
+            self._readfile(fabspath)
         #self.filepath.delete(0, tk.END)
 
     def dec(self):
