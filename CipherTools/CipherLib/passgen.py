@@ -1,9 +1,11 @@
 from Crypto.Random import random
 import re
-
-strong = re.compile(r'^(?=.{6,})((?=.*[a-zA-Z])(?=.*[\W_])(?=.*[0-9])).*$')
-medium = re.compile(r'^(?=.{6,})((?=.*[a-zA-Z])(?=.*[0-9])|(?=.*[a-zA-Z])(?=.*[\W_])|(?=.*[0-9])(?=.*[\W_])).*$')
-weak = re.compile(r'(?=.{6,}).*$')
+strength_order = [
+        r'^(?=.{6,})((?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*[0-9])).*$',
+        r'^(?=.{6,})((?=.*[a-zA-Z])(?=.*[\W_])(?=.*[0-9])).*$',
+        r'^(?=.{6,})((?=.*[a-zA-Z])(?=.*[0-9])|(?=.*[a-zA-Z])(?=.*[\W_])|(?=.*[0-9])(?=.*[\W_])).*$', 
+        r'(?=.{6,}).*$'
+        ]
 
 def generate_password(passlen=16, exclude = '%'):
     p = ''
@@ -18,19 +20,14 @@ def generate_password(passlen=16, exclude = '%'):
     return p
 
 def get_pass_strength(password):
-    m = strong.match(password)
-    if m is not None:
-        return 2
-    else:
-        m = medium.match(password)
+    levels = len(strength_order)-1
+    for idx, r in enumerate(strength_order):
+        p = re.compile(r)
+        m = p.match(password)
         if m is not None:
-            return 1
-        else:
-            m = weak.match(password)
-            if m is not None:
-                return 0
-            else:
-                return -1
+            return levels-idx
+            break
+    return -1
 
 if __name__ == '__main__':
     password = generate_password()

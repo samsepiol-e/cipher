@@ -110,14 +110,16 @@ class CredGui():
         if isinstance(password, bytes):
             password = password.decode('utf-8')
         passstr = get_pass_strength(password)
-        if passstr == 2:
-            self.passentry.config(bg = 'green')
+        if passstr == 3:
+            self.passentry.config(bg = 'deep sky blue')
+        elif passstr == 2:
+            self.passentry.config(bg = 'pale green')
         elif passstr == 1:
             self.passentry.config(bg = 'yellow')
         elif passstr == 0:
-            self.passentry.config(bg = 'red')
+            self.passentry.config(bg = 'orange')
         else:
-            self.passentry.config(bg = 'grey')
+            self.passentry.config(bg = 'red')
 
     def add_cred(self):
         section = self.secentry.get()
