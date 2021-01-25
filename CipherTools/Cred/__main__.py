@@ -3,7 +3,7 @@ from CipherLib.passgen import *
 import configparser
 import tkinter as tk
 from tkinter import ttk
-from ttkthemes import ThemedTk
+from ttkthemes import ThemedTk, ThemedStyle
 import tkinter.filedialog as fd
 import os
 import pyperclip
@@ -17,10 +17,12 @@ class CredGui():
         #self.master.config(background = True)
         self.master.title('3ncryp710n T00lz')
         #self.style = ThemedStyle(self.master)
+        #self.style.set_theme('equilux')
+        #self.style.configure('MINE.HORIZONTAL.TProgressbar', foreground='red')
         #self.style.set_theme('scidgrey')
         self.frame = ttk.Frame(self.master)
         self.statuslabel = tk.StringVar()
-        self.width = 620
+        self.width = 750
         self.height = 530
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
@@ -46,7 +48,7 @@ class CredGui():
         self.myscroll.grid(row=4, column = 2, sticky='nw')
         self.mylist = tk.Listbox(self.master, yscrollcommand = self.myscroll.set, width = 50, bg = '#414141', fg = '#A3A3A3')
         #self.mylist = ttk.Combobox(self.master, width = 50, height = 50)
-        self.mylist.grid(row=4, column = 1, columnspan=3, sticky=tk.W)
+        self.mylist.grid(row=4, column = 1, columnspan=2, sticky=tk.W)
         self.myscroll.config( command = self.mylist.yview )
 
         ttk.Button(self.master, text='Encrypt', command=self.enc).grid(row=10, column=1, sticky=tk.W, pady=4)
@@ -78,12 +80,15 @@ class CredGui():
         self.passexe = ttk.Entry(self.master)
         self.passlene.grid(row = 20, column = 1, sticky=tk.W)
         self.passexe.grid(row = 20, column = 2, sticky=tk.W)
+        self.pbval = tk.IntVar(value = 0)
+        self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 4, mode = 'determinate', length=400)#, style = "MINE.Horizontal.TProgressbar")
+        self.pb.grid(row = 21, column = 1, sticky=tk.W, columnspan = 4)
         self.passlene.insert(tk.END, '32')
         self.passexe.insert(tk.END, r'%\()|{}[]:";' + "'" + '<>,./?')
-        ttk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=21, column =1, sticky=tk.W, pady = 4)
-        ttk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=21, column =2, sticky=tk.W, pady = 4)
+        ttk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=22, column =1, sticky=tk.W, pady = 4)
+        ttk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=22, column =2, sticky=tk.W, pady = 4)
 
-        ttk.Button(self.master, text='Encrypt and Quit', command=self.encrypt_and_quit).grid(row=22, column=3, sticky=tk.W, pady=4)
+        ttk.Button(self.master, text='Encrypt and Quit', command=self.encrypt_and_quit).grid(row=23, column=3, sticky=tk.W, pady=4)
 
         self.master.bind('<Control-o>', lambda event: self.opendatafile())
         self.master.bind('<Control-e>', lambda event: self.enc())
@@ -126,22 +131,28 @@ class CredGui():
 
     def check_passwd_strength(self, *args):
         password = self.passentry.get()
+
         if isinstance(password, bytes):
             password = password.decode('utf-8')
         if password == '':
-            self.passlabel.config(background = 'grey')
+            self.pbval.set(0)
+        #self.passlabel.config(background = 'grey')
         else:
             passstr = get_pass_strength(password)
-            if passstr == 3:
-                self.passlabel.config(background = 'deep sky blue')
-            elif passstr == 2:
-                self.passlabel.config(background = 'pale green')
-            elif passstr == 1:
-                self.passlabel.config(background = 'yellow')
-            elif passstr == 0:
-                self.passlabel.config(background = 'orange')
-            else:
-                self.passlabel.config(background = 'red')
+            colors = ['red', 'orange', 'yellow', 'pale green', 'deep skye blue']
+            self.pbval.set(passstr+1)
+            #self.style.configure("red.Horizontal.TProgressbar", foreground = colors[passstr], background = colors[passstr])
+#
+#            if passstr == 3:
+#                self.passlabel.config(background = 'deep sky blue')
+#            elif passstr == 2:
+#                self.passlabel.config(background = 'pale green')
+#            elif passstr == 1:
+#                self.passlabel.config(background = 'yellow')
+#            elif passstr == 0:
+#                self.passlabel.config(background = 'orange')
+#            else:
+#                self.passlabel.config(background = 'red')
 
     def add_cred(self):
         section = self.secentry.get()
