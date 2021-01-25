@@ -16,9 +16,6 @@ class CredGui():
         self.master = ThemedTk(theme = 'equilux', background = True)
         #self.master.config(background = True)
         self.master.title('3ncryp710n T00lz')
-        #self.style = ThemedStyle(self.master)
-        #self.style.set_theme('equilux')
-        #self.style.configure('MINE.HORIZONTAL.TProgressbar', foreground='red')
         #self.style.set_theme('scidgrey')
         self.statuslabel = tk.StringVar()
         self.width = 800
@@ -67,31 +64,33 @@ class CredGui():
         self.userentry = ttk.Entry(self.master)
         self.secentry.grid(row=17, column = 1, sticky=tk.W)
         self.userentry.grid(row=17, column = 2, sticky=tk.W)
-        ttk.Button(self.master, text = 'Copy <C-c>', command = self.copy_passwd).grid(row=18, column =4, sticky=tk.E, pady = 4)
+        ttk.Button(self.master, text = 'Copy Password <C-c>', command = self.copy_passwd).grid(row=18, column =4, sticky=tk.E, pady = 4)
 
 
-        self.passlabel = ttk.Label(self.master, text="Password")
+        self.passlabel = ttk.Label(self.master, text="Password <C-p>")
         self.passlabel.grid(row=18, pady = 4)#, column = 0, sticky=tk.W)
         self.passvar = tk.StringVar()
         self.passentry = ttk.Entry(self.master, width = 40, textvariable=self.passvar)
-        self.passentry.grid(row=18, column = 1, sticky=tk.W, columnspan = 2, pady = 4)
+        self.passentry.grid(row=18, column = 1, sticky='ew', columnspan = 2, pady = 4)
         self.passvar.trace('w', self.check_passwd_strength)
 
-        ttk.Label(self.master, text="Password Lengt <C-h>").grid(row=19, column = 1, sticky = tk.W)
-        ttk.Label(self.master, text="Password Exclude <C-x>").grid(row=19, column = 2, sticky = tk.W)
+        self.pbval = tk.IntVar(value = 0)
+        self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 8, mode = 'determinate', length=360)
+        self.pb.grid(row = 19, column = 1, sticky='ew', columnspan = 2)
+
+        ttk.Label(self.master, text="Password Lengt <C-h>").grid(row=20, column = 1, sticky = tk.W)
+        ttk.Label(self.master, text="Password Exclude <C-x>").grid(row=20, column = 2, sticky = tk.W)
+        ttk.Button(self.master, text='Encrypt and Quit <C-q>', command=self.encrypt_and_quit).grid(row=20, column=4, sticky=tk.E, pady=4)
+
         self.passlene = ttk.Entry(self.master)
         self.passexe = ttk.Entry(self.master)
-        self.passlene.grid(row = 20, column = 1, sticky=tk.W)
-        self.passexe.grid(row = 20, column = 2, sticky=tk.W)
-        self.pbval = tk.IntVar(value = 0)
-        self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 4, mode = 'determinate', length=400)#, style = "MINE.Horizontal.TProgressbar")
-        self.pb.grid(row = 21, column = 1, sticky=tk.W, columnspan = 4)
+        self.passlene.grid(row = 21, column = 1, sticky=tk.W)
+        self.passexe.grid(row = 21, column = 2, sticky=tk.W)
         self.passlene.insert(tk.END, '32')
         self.passexe.insert(tk.END, r'%\()|{}[]:";' + "'" + '<>,./?')
         ttk.Button(self.master, text = 'Generate Password <C-g>', command = self.new_password).grid(row=22, column =1, sticky=tk.W, pady = 4)
         ttk.Button(self.master, text = 'Add Password <C-a>', command = self.add_cred).grid(row=22, column =2, sticky=tk.W, pady = 4)
 
-        ttk.Button(self.master, text='Encrypt and Quit <C-q>', command=self.encrypt_and_quit).grid(row=20, column=4, sticky=tk.W, pady=4)
 
         self.master.bind('<Control-o>', lambda event: self.opendatafile())
         self.master.bind('<Control-n>', lambda event: self.newfile())
@@ -146,20 +145,8 @@ class CredGui():
         #self.passlabel.config(background = 'grey')
         else:
             passstr = get_pass_strength(password)
-            colors = ['red', 'orange', 'yellow', 'pale green', 'deep skye blue']
+            themes = ['equilux', 'scidpink', 'scidmint', 'scidgreen', 'adapta']
             self.pbval.set(passstr+1)
-            #self.style.configure("red.Horizontal.TProgressbar", foreground = colors[passstr], background = colors[passstr])
-#
-#            if passstr == 3:
-#                self.passlabel.config(background = 'deep sky blue')
-#            elif passstr == 2:
-#                self.passlabel.config(background = 'pale green')
-#            elif passstr == 1:
-#                self.passlabel.config(background = 'yellow')
-#            elif passstr == 0:
-#                self.passlabel.config(background = 'orange')
-#            else:
-#                self.passlabel.config(background = 'red')
 
     def add_cred(self):
         section = self.secentry.get()
@@ -257,11 +244,6 @@ class CredGui():
             buf = io.StringIO()
             searchkey = self.searchentry.get()
             p = re.compile(searchkey)
-            #if searchkey == '':
-            #    self.config = configparser.ConfigParser()
-            #    fabspath = self.filepath.get()
-            #    self.config.read(fabspath)
-            #    self.config.write(buf)
             searchres = configparser.ConfigParser()
             for section in config.sections():
                 res = p.search(section)
@@ -295,26 +277,6 @@ class CredGui():
         pyperclip.copy(password)
         self.status.config(background='green')
         self.statuslabel.set('Password Copied to Clipboard')
-        #section = self.secentry.get()
-        #username = self.userentry.get()
-        #fabspath = self.filepath.get()
-        #config = configparser.ConfigParser()
-        #config.read(fabspath)
-        #if not section in config.sections():
-        #    self.statuslabel.set('Section Not Found')
-        #    self.label.config(bg='red')
-        #else:
-        #    if not config.has_option(section, username):
-        #        self.statuslabel.set('Username Not Found')
-        #        self.label.config(bg='red')
-        #    else:
-        #        password = config[section][username]
-        #        pyperclip.copy(password)
-        #        self.statuslabel.set('Password Copied to Clipboard')
-        #        self.status.config(bg = 'green')
-        #        self._readfile(fabspath)
-        #        self.passentry.delete(0, tk.END)
-        #        self.passentry.insert(tk.END, password)
 
         
 
