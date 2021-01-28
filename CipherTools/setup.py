@@ -17,7 +17,7 @@ setup(
     packages=["CipherLib"],
     include_package_data=True,
     install_requires=[
-        "pybase64", "pycrypto", "pillow", 'pyperclip', 'ttkthemes'
+        "pybase64", "pycryptodome", "pillow", 'pyperclip', 'ttkthemes'
     ],
     entry_points={"console_scripts": [
         "credtools=Cred.__main__:main",
