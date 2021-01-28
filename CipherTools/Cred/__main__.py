@@ -16,13 +16,9 @@ class CredGui():
         self.master = ThemedTk(theme = 'equilux', background = True)
         #self.master.config(background = True)
         self.master.title('3ncryp710n T00lz')
-        #self.style = ThemedStyle(self.master)
-        #self.style.set_theme('equilux')
-        #self.style.configure('MINE.HORIZONTAL.TProgressbar', foreground='red')
         #self.style.set_theme('scidgrey')
-        self.frame = ttk.Frame(self.master)
         self.statuslabel = tk.StringVar()
-        self.width = 750
+        self.width = 800
         self.height = 530
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
@@ -30,67 +26,77 @@ class CredGui():
         y = (screen_height//2) - (self.height//2)
         self.master.geometry(f'{self.width}x{self.height}+{x}+{y}')
         ttk.Label(self.master, text="Data File").grid(row=0)
-        ttk.Label(self.master, text="Decryption Key").grid(row=1)
+        ttk.Label(self.master, text="Decryption Key <C-k>").grid(row=1)
         self.filepath = ttk.Entry(self.master)
         self.keyentry = ttk.Entry(self.master)
         self.filepath.grid(row=0, column=1, sticky=tk.W)
         self.keyentry.grid(row=1, column=1, sticky=tk.W)
 
-        ttk.Button(self.master, text = 'Browse', command = self.opendatafile).grid(row=0, column =2, sticky=tk.W)
+        ttk.Button(self.master, text = 'Open <C-o>', command = self.opendatafile).grid(row=0, column =2, sticky=tk.W)
+        ttk.Button(self.master, text = 'New <C-n>', command = self.newfile).grid(row=0, column =2, sticky=tk.E)
         self.status = ttk.Label(self.master, textvariable=self.statuslabel)
         self.status.grid(row=2, column = 1, sticky=tk.W)
-        ttk.Label(self.master, text='Search').grid(row=3)
+        ttk.Label(self.master, text='Search <Ctr+f>').grid(row=3)
         self.searchvar = tk.StringVar()
         self.searchentry = ttk.Entry(self.master, width = 40, textvariable=self.searchvar)
         self.searchentry.grid(row=3, column = 1, sticky=tk.W, columnspan = 2)
         self.searchvar.trace('w', self.search)
+
+
         self.myscroll = ttk.Scrollbar(self.master)
-        self.myscroll.grid(row=4, column = 2, sticky='nw')
+        self.myscroll.grid(row=4, column = 3, sticky='nws')
         self.mylist = tk.Listbox(self.master, yscrollcommand = self.myscroll.set, width = 50, bg = '#414141', fg = '#A3A3A3')
         #self.mylist = ttk.Combobox(self.master, width = 50, height = 50)
         self.mylist.grid(row=4, column = 1, columnspan=2, sticky=tk.W)
         self.myscroll.config( command = self.mylist.yview )
 
-        ttk.Button(self.master, text='Encrypt', command=self.enc).grid(row=10, column=1, sticky=tk.W, pady=4)
-        ttk.Button(self.master, text='Decrypt', command=self.dec).grid(row=10, column=2, sticky=tk.W, pady=4)
+        ttk.Button(self.master, text='Encrypt <C-e>', command=self.enc).grid(row=10, column=1, sticky=tk.W, pady=4)
+        ttk.Button(self.master, text='Decrypt <C-d>', command=self.dec).grid(row=10, column=2, sticky=tk.W, pady=4)
 
         self.master.grid_columnconfigure(5, weight = 2)
         self.master.grid_columnconfigure(4, weight = 2)
 
-        ttk.Label(self.master, text="Credential").grid(row=15)
-        ttk.Label(self.master, text="Section").grid(row=16, column = 1, sticky=tk.W)
-        ttk.Label(self.master, text="Username").grid(row=16, column = 2, sticky=tk.W)
+        ttk.Separator(self.master).grid(row = 14, sticky = 'ew', columnspan = 6)
+        ttk.Label(self.master, text="Credential").grid(row=15, pady = 4)
+        ttk.Label(self.master, text="Section <C-s>").grid(row=16, column = 1, sticky=tk.W)
+        ttk.Label(self.master, text="Username <C-u>").grid(row=16, column = 2, sticky=tk.W)
         self.secentry = ttk.Entry(self.master)
         self.userentry = ttk.Entry(self.master)
         self.secentry.grid(row=17, column = 1, sticky=tk.W)
         self.userentry.grid(row=17, column = 2, sticky=tk.W)
-        ttk.Button(self.master, text = 'Copy Password', command = self.copy_passwd).grid(row=17, column =3, sticky=tk.W)
+        ttk.Button(self.master, text = 'Copy Password <C-c>', command = self.copy_passwd).grid(row=18, column =4, sticky=tk.E, pady = 4)
 
 
-        self.passlabel = ttk.Label(self.master, text="Password")
-        self.passlabel.grid(row=18)#, column = 0, sticky=tk.W)
+        self.passlabel = ttk.Label(self.master, text="Password <C-p>")
+        self.passlabel.grid(row=18, pady = 4)#, column = 0, sticky=tk.W)
         self.passvar = tk.StringVar()
         self.passentry = ttk.Entry(self.master, width = 40, textvariable=self.passvar)
-        self.passentry.grid(row=18, column = 1, sticky=tk.W, columnspan = 2)
+        self.passentry.grid(row=18, column = 1, sticky='ew', columnspan = 2, pady = 4)
         self.passvar.trace('w', self.check_passwd_strength)
 
-        ttk.Label(self.master, text="Password Length").grid(row=19, column = 1)
-        ttk.Label(self.master, text="Password Exclude").grid(row=19, column = 2)
+        self.pbval = tk.IntVar(value = 0)
+        self.passcheckphrase = tk.StringVar()
+        self.passcheckl = ttk.Label(self.master, textvariable = self.passcheckphrase)
+        self.passcheckl.grid(row = 19, column = 0)
+        self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 8, mode = 'determinate', length=360)
+        self.pb.grid(row = 19, column = 1, sticky='ew', columnspan = 2)
+
+        ttk.Label(self.master, text="Password Lengt <C-h>").grid(row=20, column = 1, sticky = tk.W)
+        ttk.Label(self.master, text="Password Exclude <C-x>").grid(row=20, column = 2, sticky = tk.W)
+        ttk.Button(self.master, text='Encrypt and Quit <C-q>', command=self.encrypt_and_quit).grid(row=20, column=4, sticky=tk.E, pady=4)
+
         self.passlene = ttk.Entry(self.master)
         self.passexe = ttk.Entry(self.master)
-        self.passlene.grid(row = 20, column = 1, sticky=tk.W)
-        self.passexe.grid(row = 20, column = 2, sticky=tk.W)
-        self.pbval = tk.IntVar(value = 0)
-        self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 4, mode = 'determinate', length=400)#, style = "MINE.Horizontal.TProgressbar")
-        self.pb.grid(row = 21, column = 1, sticky=tk.W, columnspan = 4)
+        self.passlene.grid(row = 21, column = 1, sticky=tk.W)
+        self.passexe.grid(row = 21, column = 2, sticky=tk.W)
         self.passlene.insert(tk.END, '32')
         self.passexe.insert(tk.END, r'%\()|{}[]:";' + "'" + '<>,./?')
-        ttk.Button(self.master, text = 'Generate Password', command = self.new_password).grid(row=22, column =1, sticky=tk.W, pady = 4)
-        ttk.Button(self.master, text = 'Add Password', command = self.add_cred).grid(row=22, column =2, sticky=tk.W, pady = 4)
+        ttk.Button(self.master, text = 'Generate Password <C-g>', command = self.new_password).grid(row=22, column =1, sticky=tk.W, pady = 4)
+        ttk.Button(self.master, text = 'Add Password <C-a>', command = self.add_cred).grid(row=22, column =2, sticky=tk.W, pady = 4)
 
-        ttk.Button(self.master, text='Encrypt and Quit', command=self.encrypt_and_quit).grid(row=23, column=3, sticky=tk.W, pady=4)
 
         self.master.bind('<Control-o>', lambda event: self.opendatafile())
+        self.master.bind('<Control-n>', lambda event: self.newfile())
         self.master.bind('<Control-e>', lambda event: self.enc())
         self.master.bind('<Control-d>', lambda event: self.dec())
         self.keyentry.bind('<Return>', lambda event: self.dec())
@@ -102,9 +108,12 @@ class CredGui():
         self.master.bind('<Control-l>', lambda event: self.clear())
         self.master.bind('<Control-r>', lambda event: self.del_cred())
         self.master.bind('<Control-f>', lambda event: self.searchentry.focus_set())
+        self.master.bind('<Control-p>', lambda event: self.passentry.focus_set())
         self.master.bind('<Control-s>', lambda event: self.secentry.focus_set())
         self.master.bind('<Control-u>', lambda event: self.userentry.focus_set())
         self.master.bind('<Control-k>', lambda event: self.keyentry.focus_set())
+        self.master.bind('<Control-x>', lambda event: self.passexe.focus_set())
+        self.master.bind('<Control-h>', lambda event: self.passlene.focus_set())
         #self.searchentry.bind('<Key>', self.search)
         #self.searchentry.bind('<FocusIn>', self.search)
         self.master.bind('<<ListboxSelect>>', self.lbselect)
@@ -136,23 +145,16 @@ class CredGui():
             password = password.decode('utf-8')
         if password == '':
             self.pbval.set(0)
+            self.passcheckphrase.set('')
+            self.passlabel.config(background=None)
         #self.passlabel.config(background = 'grey')
         else:
             passstr = get_pass_strength(password)
-            colors = ['red', 'orange', 'yellow', 'pale green', 'deep skye blue']
+            outputphrase = ['bad', 'very weak', 'weak', 'slightly weak', 'slightly strong', 'strong', 'very strong', 'excellent']
+            outputcol = ['red', 'orange', 'yellow', 'pale green', 'green', 'deep sky blue', 'blue', 'purple']
             self.pbval.set(passstr+1)
-            #self.style.configure("red.Horizontal.TProgressbar", foreground = colors[passstr], background = colors[passstr])
-#
-#            if passstr == 3:
-#                self.passlabel.config(background = 'deep sky blue')
-#            elif passstr == 2:
-#                self.passlabel.config(background = 'pale green')
-#            elif passstr == 1:
-#                self.passlabel.config(background = 'yellow')
-#            elif passstr == 0:
-#                self.passlabel.config(background = 'orange')
-#            else:
-#                self.passlabel.config(background = 'red')
+            self.passcheckphrase.set(outputphrase[passstr])
+            self.passlabel.config(background=outputcol[passstr])
 
     def add_cred(self):
         section = self.secentry.get()
@@ -250,11 +252,6 @@ class CredGui():
             buf = io.StringIO()
             searchkey = self.searchentry.get()
             p = re.compile(searchkey)
-            #if searchkey == '':
-            #    self.config = configparser.ConfigParser()
-            #    fabspath = self.filepath.get()
-            #    self.config.read(fabspath)
-            #    self.config.write(buf)
             searchres = configparser.ConfigParser()
             for section in config.sections():
                 res = p.search(section)
@@ -288,34 +285,23 @@ class CredGui():
         pyperclip.copy(password)
         self.status.config(background='green')
         self.statuslabel.set('Password Copied to Clipboard')
-        #section = self.secentry.get()
-        #username = self.userentry.get()
-        #fabspath = self.filepath.get()
-        #config = configparser.ConfigParser()
-        #config.read(fabspath)
-        #if not section in config.sections():
-        #    self.statuslabel.set('Section Not Found')
-        #    self.label.config(bg='red')
-        #else:
-        #    if not config.has_option(section, username):
-        #        self.statuslabel.set('Username Not Found')
-        #        self.label.config(bg='red')
-        #    else:
-        #        password = config[section][username]
-        #        pyperclip.copy(password)
-        #        self.statuslabel.set('Password Copied to Clipboard')
-        #        self.status.config(bg = 'green')
-        #        self._readfile(fabspath)
-        #        self.passentry.delete(0, tk.END)
-        #        self.passentry.insert(tk.END, password)
 
         
 
     def opendatafile(self):
         self.filepath.delete(0, tk.END)
         fabspath = fd.askopenfilename(title = 'Please choose Data File')
+        if fabspath != '':
+            self._readfile(fabspath)
+            self.filepath.insert(tk.END, fabspath)
+            self.keyentry.focus_set()
+
+    def newfile(self):
+        self.filepath.delete(0, tk.END)
+        f = fd.asksaveasfile('wb')
+        self.filepath.insert(tk.END, f.name)
+        fabspath = self.filepath.get()
         self._readfile(fabspath)
-        self.filepath.insert(tk.END, fabspath)
         self.keyentry.focus_set()
 
     def _readfile(self, fabspath):
