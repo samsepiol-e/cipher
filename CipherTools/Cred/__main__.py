@@ -75,6 +75,9 @@ class CredGui():
         self.passvar.trace('w', self.check_passwd_strength)
 
         self.pbval = tk.IntVar(value = 0)
+        self.passcheckphrase = tk.StringVar()
+        self.passcheckl = ttk.Label(self.master, textvariable = self.passcheckphrase)
+        self.passcheckl.grid(row = 19, column = 0)
         self.pb = ttk.Progressbar(self.master, orient = tk.HORIZONTAL, variable = self.pbval, maximum = 8, mode = 'determinate', length=360)
         self.pb.grid(row = 19, column = 1, sticky='ew', columnspan = 2)
 
@@ -142,11 +145,16 @@ class CredGui():
             password = password.decode('utf-8')
         if password == '':
             self.pbval.set(0)
+            self.passcheckphrase.set('')
+            self.passlabel.config(background=None)
         #self.passlabel.config(background = 'grey')
         else:
             passstr = get_pass_strength(password)
-            themes = ['equilux', 'scidpink', 'scidmint', 'scidgreen', 'adapta']
+            outputphrase = ['bad', 'very weak', 'weak', 'slightly weak', 'slightly strong', 'strong', 'very strong', 'excellent']
+            outputcol = ['red', 'orange', 'yellow', 'pale green', 'green', 'deep sky blue', 'blue', 'purple']
             self.pbval.set(passstr+1)
+            self.passcheckphrase.set(outputphrase[passstr])
+            self.passlabel.config(background=outputcol[passstr])
 
     def add_cred(self):
         section = self.secentry.get()
