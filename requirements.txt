@@ -1,2 +1,3 @@
-pycrypto==2.6.1
-pillow==7.0.0
+pycryptodome>=3.9.9
+pillow
+pyperclip>=1.8.1

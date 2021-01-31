@@ -1,0 +1,6 @@
+newbranch
+mergebranch
+CipherTools/dist
+CipherTools/build
+CipherTools/*.egg-info/*
+CipherTools/*/__pycache__/*
